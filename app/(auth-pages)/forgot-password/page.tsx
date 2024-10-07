@@ -19,7 +19,7 @@ export default function ForgotPassword({
           <p className="text-sm text-secondary-foreground">
             Already have an account?{" "}
             <Link className="text-primary underline" href="/sign-in">
-              Sign in
+              Iniciar sesión
             </Link>
           </p>
         </div>
