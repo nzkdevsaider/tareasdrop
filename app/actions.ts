@@ -124,3 +124,31 @@ export const signOutAction = async () => {
   await supabase.auth.signOut();
   return redirect($CONST.routes.signIn);
 };
+
+export const createTaskAction = async (
+  title: string,
+  description: string,
+  reward: number,
+  deadline: Date | undefined
+) => {
+  if (!title || !description || !reward || !deadline) {
+    throw new Error("Todos los campos son requeridos.");
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase.from("tasks").insert([
+    {
+      title,
+      description,
+      budget: reward,
+      deadline,
+      //creator_id: (await supabase.auth.getUser()).data.user?.id,
+    },
+  ]);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  redirect($CONST.routes.tasks);
+};

@@ -3,19 +3,59 @@ import { useState } from "react";
 import { Input } from "./ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, PlusIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
+import CurrencyInput from "./ui/currency-input";
+import { Label } from "./ui/label";
+import { createTaskAction } from "@/app/actions";
+import { toast } from "sonner";
 
 const TaskCreator = () => {
   const [deadline, setDeadline] = useState<Date>();
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [reward, setReward] = useState<number>(0);
+
+  const handleChangeReward = (value: number) => {
+    setReward(value);
+  };
+
   return (
-    <form className="flex flex-col gap-4">
+    <form
+      className="flex flex-col gap-4"
+      action={() =>
+        createTaskAction(title, description, reward, deadline)
+          .then(() => {
+            toast("Tarea creada exitosamente");
+          })
+          .catch((error) => {
+            toast(`Ocurrió un error al crear la tarea: ${error.message}`);
+          })
+      }
+    >
       <h1 className="text-4xl font-bold">Crear una nueva tarea</h1>
-      <Input placeholder="Título" />
-      <Input placeholder="Descripción" />
-      <Input placeholder="Recompensa" />
+      <Label>Título</Label>
+      <Input
+        placeholder="Título"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <Label>Descripción</Label>
+      <Input
+        placeholder="Descripción"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      <CurrencyInput
+        label="Recompensa"
+        value={reward}
+        onChange={handleChangeReward}
+        prefix="$"
+        placeholder="0.00"
+      />
+      <Label>Fecha de entrega</Label>
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -45,6 +85,7 @@ const TaskCreator = () => {
         </PopoverContent>
       </Popover>
       <Button variant={"default"} type="submit">
+        <PlusIcon />
         Crear tarea
       </Button>
     </form>
