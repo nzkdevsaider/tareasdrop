@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/server";
+import { $CONST } from "@/lib/constants";
 
 export default async function AuthButton() {
   const {
@@ -49,6 +50,9 @@ export default async function AuthButton() {
   return user ? (
     <div className="flex items-center gap-4">
       {user.email}
+      <Button asChild size="sm" variant={"default"}>
+        <Link href={$CONST.routes.createtask}>Crear tarea</Link>
+      </Button>
       <form action={signOutAction}>
         <Button type="submit" variant={"outline"}>
           Cerrar sesión
