@@ -1,11 +1,11 @@
-import FetchDataSteps from "@/components/tutorial/fetch-data-steps";
 import { createClient } from "@/utils/supabase/server";
-import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 import { $CONST } from "@/lib/constants";
+import ExplorerPage from "@/components/ExplorerPage";
 
 export default async function ProtectedPage() {
   const supabase = createClient();
+  const { data: tasks } = await supabase.from("tasks").select("*");
 
   const {
     data: { user },
@@ -15,5 +15,9 @@ export default async function ProtectedPage() {
     return redirect($CONST.routes.signIn);
   }
 
-  return <main>Explorer</main>;
+  if (!tasks) {
+    return <div>Cargando...</div>;
+  }
+
+  return <ExplorerPage tasks={tasks} />;
 }

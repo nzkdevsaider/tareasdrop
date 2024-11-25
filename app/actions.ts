@@ -141,7 +141,7 @@ export const createTaskAction = async (
       title,
       description,
       budget: reward,
-      deadline,
+      deadline: deadline.toISOString(),
       //creator_id: (await supabase.auth.getUser()).data.user?.id,
     },
   ]);
@@ -151,4 +151,47 @@ export const createTaskAction = async (
   }
 
   redirect($CONST.routes.tasks);
+};
+
+export const applyToTaskAction = async (
+  taskId: string,
+  price: string,
+  delivery_time: Date,
+  description: string
+) => {
+  if (!taskId || !price || !delivery_time || !description) {
+    throw new Error("Todos los campos son requeridos.");
+  }
+
+  const supabase = createClient();
+  const { data: proposals } = await supabase.from("proposals").select("*");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.id) {
+    throw new Error("Usuario no encontrado.");
+  }
+
+  const { error } = await supabase.from("proposals").insert({
+    task_id: taskId,
+    worker_id: user.id,
+    price: Number(price),
+    delivery_time: delivery_time.toISOString(),
+    description,
+  });
+
+  if (
+    proposals?.find(
+      (proposal) =>
+        proposal.task_id === taskId && proposal.worker_id === user.id
+    )
+  ) {
+    throw new Error("Ya has aplicado a esta tarea.");
+  }
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  redirect($CONST.routes.explorer);
 };
